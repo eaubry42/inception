@@ -1,0 +1,12 @@
+[mysqld]
+user = mysql
+pid-file = /run/mysqld/mysqld.pid
+socket = /run/mysqld/mysqld.sock
+datadir = /var/lib/mysql
+log-error = /var/log/mysql/error.log
+symbolic-links = 0
+
+max_connect_errors = 1000
+
+aria-pagecache-buffer-size = 16M
+innodb_buffer_pool_size = 128M

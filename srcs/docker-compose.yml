@@ -1,0 +1,65 @@
+services:
+  mariadb:
+    container_name: mariadb
+    build:
+      context: ./requirements/mariadb
+    env_file:
+      - .env
+    volumes:
+      - mariadb_data:/var/lib/mysql
+    restart: always
+    networks:
+      - inception
+
+  wordpress:
+    container_name: wordpress
+    build:
+      context: ./requirements/wordpress
+    env_file:
+      - .env
+    environment:
+      - DOMAIN_NAME=${DOMAIN_NAME}
+      - NEW_DB_NAME=${NEW_DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_HOST=${DB_HOST}
+    volumes:
+      - wordpress_data:/var/www/html
+    restart: always
+    depends_on:
+      - mariadb
+    networks:
+      - inception
+
+
+  nginx:
+    container_name: nginx
+    build:
+      context: ./requirements/nginx
+    volumes:
+      - wordpress_data:/var/www/html
+    depends_on:
+      - wordpress
+    ports:
+      - "443:443"
+    restart: always
+    networks:
+      - inception
+
+volumes:
+  mariadb_data:
+    driver: local
+    driver_opts:
+      type: none
+      device: /home/eaubry/data/mariadb
+      o: bind
+  wordpress_data:
+    driver: local
+    driver_opts:
+      type: none
+      device: /home/eaubry/data/wordpress
+      o: bind
+
+networks:
+  inception:
+    driver: bridge
